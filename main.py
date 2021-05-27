@@ -1,7 +1,14 @@
 import pygame
 import sys
 import random
+import pygame_menu
+from pygame_menu.examples import create_example_window
 
+from typing import Tuple, Any
+
+surface = create_example_window('Example - Simple', (600, 400))
+
+'#Ctrl + Alt + L to fix indentation'
 
 class Snake(object):
     def __init__(self):
@@ -71,7 +78,6 @@ class Food(object):
         self.position = (random.randint(0, GRID_WIDTH - 1) * GRIDSIZE, random.randint(0, GRID_HEIGHT - 1) * GRIDSIZE)
 
     def draw(self, surface):
-
         r = pygame.Rect((self.position[0], self.position[1]), (GRIDSIZE, GRIDSIZE))
         pygame.draw.rect(surface, self.color, r)
         pygame.draw.rect(surface, (93, 216, 228), r, 1)
@@ -103,7 +109,12 @@ LEFT = (-1, 0)
 RIGHT = (1, 0)
 
 
-def main():
+def set_difficulty(selected: Tuple, value: Any) -> None:
+    print('Set difficulty to {} ({})'.format(selected[0], value))
+
+
+def start_the_game() -> None:
+    global user_name
     pygame.init()
 
     clock = pygame.time.Clock()
@@ -117,8 +128,6 @@ def main():
     food = Food()
 
     myfont = pygame.font.SysFont("monospace", 16)
-
-
 
     while True:
         clock.tick(10)
@@ -137,4 +146,17 @@ def main():
         pygame.display.update()
 
 
-main()
+menu = pygame_menu.Menu(
+    height=300,
+    theme=pygame_menu.themes.THEME_DARK,
+    title='Welcome',
+    width=400
+)
+
+user_name = menu.add.text_input('Name: ', default='John Doe', maxchar=10)
+menu.add.selector('Difficulty: ', [('Hard', 1), ('Easy', 2)], onchange=set_difficulty)
+menu.add.button('Play', start_the_game)
+menu.add.button('Quit', pygame_menu.events.EXIT)
+
+if __name__ == '__main__':
+    menu.mainloop(surface)
