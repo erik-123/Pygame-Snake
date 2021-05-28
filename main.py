@@ -2,13 +2,14 @@ import pygame
 import sys
 import random
 import pygame_menu
-from pygame_menu.examples import create_example_window
 
-from typing import Tuple, Any
 
-surface = create_example_window('Example - Simple', (600, 400))
 
+
+black = (0, 0, 0)
+background = pygame.image.load('snake-game(new).png')
 '#Ctrl + Alt + L to fix indentation'
+
 
 class Snake(object):
     def __init__(self):
@@ -109,11 +110,10 @@ LEFT = (-1, 0)
 RIGHT = (1, 0)
 
 
-def set_difficulty(selected: Tuple, value: Any) -> None:
-    print('Set difficulty to {} ({})'.format(selected[0], value))
 
 
-def start_the_game() -> None:
+
+def start_the_game():
     global user_name
     pygame.init()
 
@@ -129,34 +129,48 @@ def start_the_game() -> None:
 
     myfont = pygame.font.SysFont("monospace", 16)
 
+    menu = True
+
+
+
+
+    while menu:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    menu = False
+        screen.fill((0, 0, 0))
+        w, h = pygame.display.get_surface().get_size()
+        clock.tick(30)
+        screen.blit(background, (0, 0))
+        pygame.display.update()
+
     while True:
         clock.tick(10)
         snake.handle_keys()
         drawGrid(surface)
         snake.move()
+
         if snake.get_head_position() == food.position:
             snake.length += 1
             snake.score += 1
             food.randomize_position()
+
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_p:
+                print('true')
+                menu = True
+
         snake.draw(surface)
         food.draw(surface)
         screen.blit(surface, (0, 0))
         text = myfont.render("Score {0}".format(snake.score), 1, (0, 0, 0))
         screen.blit(text, (5, 10))
+
         pygame.display.update()
 
 
-menu = pygame_menu.Menu(
-    height=300,
-    theme=pygame_menu.themes.THEME_DARK,
-    title='Welcome',
-    width=400
-)
-
-user_name = menu.add.text_input('Name: ', default='John Doe', maxchar=10)
-menu.add.selector('Difficulty: ', [('Hard', 1), ('Easy', 2)], onchange=set_difficulty)
-menu.add.button('Play', start_the_game)
-menu.add.button('Quit', pygame_menu.events.EXIT)
-
-if __name__ == '__main__':
-    menu.mainloop(surface)
+start_the_game()
